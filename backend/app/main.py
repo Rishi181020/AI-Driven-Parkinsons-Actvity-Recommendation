@@ -34,4 +34,5 @@ def health():
     return {"status": "ok"}
 
 app.include_router(users.router, prefix="/v1")
-# 
+app.include_router(predict.router, prefix="/v1") 
+app.include_router(chat.router,    prefix="/v1") 
