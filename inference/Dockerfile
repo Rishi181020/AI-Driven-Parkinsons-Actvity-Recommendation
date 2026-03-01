@@ -6,16 +6,18 @@ RUN apt-get update && apt-get install -y \
     cmake ninja-build build-essential pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /app/
+# Copy requirements from the inference/ folder (because build context is repo root)
+COPY inference/requirements.txt /app/requirements.txt
 
-# 2. Compile llama-cpp for AMD ROCm
-RUN pip3 install --no-cache-dir llama-cpp-python
+# Install python deps (do llama-cpp either CPU or ROCm, see notes below)
+RUN pip3 install --no-cache-dir -r /app/requirements.txt
 
-# 3. Install TensorFlow and other dependencies
-RUN pip3 install --no-cache-dir -r requirements.txt
+# Copy app.py and the TF model
+COPY inference/app.py /app/app.py
+COPY inference/fog_6class_lstm_patched.keras /app/fog_6class_lstm_patched.keras
 
-# 4. Copy EVERYTHING (this includes your models/ folder and app.py)
-COPY . /app/
+# (Optional) copy models into image, but you're mounting it anyway
+# COPY models /app/models
 
 ENV HSA_OVERRIDE_GFX_VERSION=10.3.0
 
