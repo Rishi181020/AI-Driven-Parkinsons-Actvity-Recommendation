@@ -1,33 +1,27 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import List
+from llama_cpp import Llama
 
 router = APIRouter(tags=["Chat"])
 
-class ChatMessage(BaseModel):
-    role: str  # 'user' or 'assistant'
-    content: str
+# Load TinyLlama with GPU acceleration
+llm = Llama(
+    model_path="models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
+    n_gpu_layers=-1, # Put all layers on the AMD GPU
+    n_ctx=2048
+)
 
 class ChatRequest(BaseModel):
     message: str
-    history: List[ChatMessage] = []
 
 @router.post("/chat")
-async def handle_chat(request: ChatRequest):
-    """
-    Endpoint to provide activity recommendations and answer Parkinson's related questions.
-    """
-    user_query = request.message.lower()
+async def chat_with_tinyllama(request: ChatRequest):
+    # TinyLlama prompt format
+    prompt = f"<|system|>\nYou are a Parkinson's assistant specialized in exercise advice.</s>\n<|user|>\n{request.message}</s>\n<|assistant|>\n"
     
-    # Simple logic for MVP recommendations
-    # replace with llm later
-    if "exercise" in user_query or "activity" in user_query:
-        recommendation = "Based on your Parkinson's profile, light walking or Tai Chi is recommended to improve balance."
-    else:
-        recommendation = "I'm here to help with activity recommendations. How are you feeling today?"
-
+    response = llm(prompt, max_tokens=256, stop=["</s>"], echo=False)
+    
     return {
         "role": "assistant",
-        "content": recommendation
+        "content": response["choices"][0]["text"].strip()
     }
-
