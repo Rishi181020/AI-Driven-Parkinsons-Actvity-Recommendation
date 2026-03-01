@@ -4,3 +4,4 @@ tensorflow==2.20.0
 numpy
 pydantic
 h5py
+llama-cpp-python

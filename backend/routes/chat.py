@@ -1,33 +1,28 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import List
+from llama_cpp import Llama
 
 router = APIRouter(tags=["Chat"])
 
-class ChatMessage(BaseModel):
-    role: str  # 'user' or 'assistant'
-    content: str
+# Load the GGUF model
+# n_gpu_layers=-1 tells llama.cpp to put EVERYTHING on the AMD GPU
+llm = Llama(
+    model_path="models/llama-3-8b-instruct.gguf",
+    n_gpu_layers=-1, 
+    n_ctx=2048
+)
 
 class ChatRequest(BaseModel):
     message: str
-    history: List[ChatMessage] = []
 
 @router.post("/chat")
-async def handle_chat(request: ChatRequest):
-    """
-    Endpoint to provide activity recommendations and answer Parkinson's related questions.
-    """
-    user_query = request.message.lower()
+async def chat_with_llama(request: ChatRequest):
+    # Standard Llama-3 prompt format
+    prompt = f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n{request.message}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
     
-    # Simple logic for MVP recommendations
-    # replace with llm later
-    if "exercise" in user_query or "activity" in user_query:
-        recommendation = "Based on your Parkinson's profile, light walking or Tai Chi is recommended to improve balance."
-    else:
-        recommendation = "I'm here to help with activity recommendations. How are you feeling today?"
-
+    response = llm(prompt, max_tokens=256, stop=["<|eot_id|>"], echo=False)
+    
     return {
         "role": "assistant",
-        "content": recommendation
+        "content": response["choices"][0]["text"].strip()
     }
-
