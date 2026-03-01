@@ -180,6 +180,8 @@ def chat(req: ChatRequest):
     prompt = f"""<|system|>
     You are a Parkinson's assistant. Use the provided sensor inference context to give safe, practical suggestions.
     If context is missing, ask 1 clarifying question.
+    You have to majorly answer based on a combination of latest research and the interpretation of the sensor
+    statistics.
     </s>
     <|user|>
     User message: {req.message}
