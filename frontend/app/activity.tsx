@@ -9,7 +9,7 @@ import {
 import { router } from "expo-router";
 import Svg, { Circle } from "react-native-svg";
 import { COLORS } from "@/constants/colors";
-import { AppStatusBar } from "@/components/ui";
+import { AppStatusBar } from "@/components/ui/UIComponents";
 import { useTimer } from "@/hooks/useTimer";
 
 type Phase = "detail" | "timer" | "feedback";
