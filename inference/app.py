@@ -28,7 +28,7 @@ def _get_device() -> str:
 def _load_model() -> None:
     global _MODEL
 
-    model_path = os.getenv("MODEL_PATH", "./fog_6class_lstm.keras")
+    model_path = os.getenv("MODEL_PATH", "./app/fog_6class_lstm.keras")
     if not os.path.exists(model_path):
         raise RuntimeError(
             f"Model file not found at '{model_path}'. Set MODEL_PATH or copy fog_6class_lstm.keras into the container."
