@@ -56,7 +56,7 @@ def startup_event():
     # Using n_gpu_layers=10 to save some VRAM for the LSTM model
     llm_path = "./models/medgemma-4b-it-q8_0.gguf"
     if os.path.exists(llm_path):
-        _LLM = Llama(model_path=llm_path, n_gpu_layers=-1, n_ctx=2048, verbose=False)
+        _LLM = Llama(model_path=llm_path, n_gpu_layers=-1, n_ctx=8192, verbose=False)
 
 
 @app.get("/health")
@@ -159,7 +159,6 @@ def infer(req: InferRequest):
     LATEST_CTX = event
     HISTORY.append(event)
 
-    # ---- Response ----
     return InferResponse(
         probs=probs_1d.tolist(),
         pred_index=pred_index,
@@ -233,5 +232,8 @@ def chat(req: ChatRequest):
     1) Any tremor, stiffness, or balance issues this morning?
     2) No sensor data yet — your current symptom state will shape the safest plan.
     """
+
+    prompt = prompt + examples
+
     output = _LLM(prompt, max_tokens=192, stop=["</s>"], echo=False)
     return {"role": "assistant", "content": output["choices"][0]["text"].strip()}
