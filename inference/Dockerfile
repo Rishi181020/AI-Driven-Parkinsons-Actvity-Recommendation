@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt /app/
 
 # 2. Compile llama-cpp for AMD ROCm
-RUN CMAKE_ARGS="-DGGML_HIPBLAS=on" pip3 install --no-cache-dir llama-cpp-python
+RUN pip3 install --no-cache-dir llama-cpp-python
 
 # 3. Install TensorFlow and other dependencies
 RUN pip3 install --no-cache-dir -r requirements.txt
