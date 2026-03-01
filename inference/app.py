@@ -56,7 +56,7 @@ def startup_event():
     # Using n_gpu_layers=10 to save some VRAM for the LSTM model
     llm_path = "./models/medgemma-4b-it-q8_0.gguf"
     if os.path.exists(llm_path):
-        _LLM = Llama(model_path=llm_path, n_gpu_layers=0, n_ctx=4096, verbose=False)
+        _LLM = Llama(model_path=llm_path, n_gpu_layers=0, n_ctx=3072, verbose=True)
 
 
 @app.get("/health")
@@ -197,43 +197,6 @@ def chat(req: ChatRequest):
     </s>
     <|assistant|>
     """
-
-    examples = """
-
-    Here are some examples of how to respond:
-    
-    [Gait Training, 87% confident, history: Rest → Seated Exercise → Gait Training]
-    User: My legs feel stiff, should I keep going?
-    Assistant:
-    1) Keep going but shorten your stride and slow down for a few minutes.
-    2) You're transitioning from rest — your muscles are still warming up, pushing hard now raises fall risk.
-
-    [UNCERTAIN: Gait/Balance/Stretching all ~30%]
-    User: What should I do next?
-    Assistant:
-    1) Move into seated stretching — it's a safe next step regardless of what you were just doing.
-    2) The sensor can't confidently distinguish your current activity, so bridging with low-intensity seated work is the safest call.
-
-    [Medication Check, 91% confident, history: Gait Training → Balance Practice → Medication Check]
-    User: I feel a bit off, not sure why.
-    Assistant:
-    1) Pause and check your last medication dose and timing.
-    2) Feeling off after exercise in Parkinson's often tracks with dopamine timing — your session history and current pattern both point here.
-
-    [Rest, 83% confident, history: Rest → Rest → Rest → Rest → Rest]
-    User: I've just been sitting, is that okay?
-    Assistant:
-    1) Fine to rest, but try 5 minutes of seated arm circles or ankle rolls now.
-    2) Five consecutive rest windows — prolonged inactivity increases rigidity risk.
-
-    [NO CONTEXT]
-    User: Can you help me plan my session?
-    Assistant:
-    1) Any tremor, stiffness, or balance issues this morning?
-    2) No sensor data yet — your current symptom state will shape the safest plan.
-    """
-
-    prompt = prompt + examples
 
     output = _LLM(prompt, max_tokens=192, stop=["</s>"], echo=False)
     return {"role": "assistant", "content": output["choices"][0]["text"].strip()}
