@@ -15,7 +15,7 @@ export const CurrentRecCard = () => {
         <Text style={styles.highlight}>March in place 2min NOW</Text>
       </Text>
 
-      <Text style={[styles.timerText, finished && { color: COLORS.green }]}>
+      <Text style={[styles.timerText, finished && { color: COLORS.success }]}>
         {fmt(timer)}
       </Text>
 
@@ -24,7 +24,7 @@ export const CurrentRecCard = () => {
         style={[styles.startBtn, running && styles.startBtnPaused]}
         activeOpacity={0.85}
       >
-        <Text style={[styles.startBtnText, running && { color: COLORS.green }]}>
+        <Text style={[styles.startBtnText, running && { color: COLORS.success }]}>
           {finished ? "✓ Done!" : running ? "⏸ Pause" : "▶ START"}
         </Text>
       </TouchableOpacity>
@@ -48,17 +48,17 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.card,
     borderWidth: 1.5,
-    borderColor: COLORS.orange + "44",
+    borderColor: COLORS.primary + "44",
     borderRadius: 24,
     padding: 20,
   },
-  tag: { fontSize: 11, color: COLORS.orange, fontWeight: "700", letterSpacing: 1, marginBottom: 6 },
+  tag: { fontSize: 11, color: COLORS.primary, fontWeight: "700", letterSpacing: 1, marginBottom: 6 },
   subtitle: { fontSize: 15, color: COLORS.textSecondary, lineHeight: 22, marginBottom: 16 },
   highlight: { color: COLORS.textPrimary, fontWeight: "700" },
   timerText: {
     fontSize: 52,
     fontWeight: "900",
-    color: COLORS.orange,
+    color: COLORS.primary,
     textAlign: "center",
     letterSpacing: -2,
     marginBottom: 16,
@@ -66,15 +66,15 @@ const styles = StyleSheet.create({
   startBtn: {
     height: 56,
     borderRadius: 18,
-    backgroundColor: COLORS.orange,
+    backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 10,
   },
   startBtnPaused: {
-    backgroundColor: COLORS.green + "33",
+    backgroundColor: COLORS.success + "33",
     borderWidth: 1.5,
-    borderColor: COLORS.green,
+    borderColor: COLORS.success,
   },
   startBtnText: { fontSize: 17, fontWeight: "800", color: "#fff" },
   row: { flexDirection: "row", gap: 10 },

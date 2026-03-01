@@ -70,7 +70,7 @@ export default function SettingsScreen() {
           <SettingsRow icon="🔒" label="Data Sharing" value="Anonymized only" />
         </SettingsGroup>
 
-        <Text style={styles.version}>Neuro v1.0.0 • Built with ❤️ for Parkinson's care</Text>
+        <Text style={styles.version}>CureMotion v1.0.0 • Built with ❤️ for Parkinson's care</Text>
         <View style={{ height: 40 }} />
       </ScrollView>
     </View>
@@ -93,10 +93,10 @@ const styles = StyleSheet.create({
   content: { padding: 20, gap: 20 },
   addMedBtn: {
     height: 44, borderRadius: 14, margin: 10,
-    backgroundColor: COLORS.orangeGlow,
-    borderWidth: 1, borderColor: COLORS.orange + "44",
+    backgroundColor: COLORS.primaryGlow,
+    borderWidth: 1, borderColor: COLORS.primary + "44",
     alignItems: "center", justifyContent: "center",
   },
-  addMedText: { fontSize: 13, fontWeight: "700", color: COLORS.orange },
+  addMedText: { fontSize: 13, fontWeight: "700", color: COLORS.primary },
   version: { textAlign: "center", fontSize: 12, color: COLORS.textMuted, marginTop: 8 },
 });

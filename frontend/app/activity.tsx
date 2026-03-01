@@ -87,7 +87,7 @@ export default function ActivityScreen() {
               <Circle cx={100} cy={100} r={88} fill="none" stroke={COLORS.cardBorder} strokeWidth={8} />
               <Circle
                 cx={100} cy={100} r={88} fill="none"
-                stroke={COLORS.orange} strokeWidth={8}
+                stroke={COLORS.primary} strokeWidth={8}
                 strokeDasharray={`${(circumference * pct) / 100} ${circumference}`}
                 strokeLinecap="round"
                 rotation={-90} origin="100, 100"
@@ -138,7 +138,7 @@ export default function ActivityScreen() {
               style={[styles.feedbackBtn, feedback === "up" && styles.feedbackBtnUp]}
             >
               <Text style={styles.feedbackBtnEmoji}>👍</Text>
-              <Text style={[styles.feedbackBtnLabel, feedback === "up" && { color: COLORS.green }]}>
+              <Text style={[styles.feedbackBtnLabel, feedback === "up" && { color: COLORS.success }]}>
                 Helped
               </Text>
             </TouchableOpacity>
@@ -147,7 +147,7 @@ export default function ActivityScreen() {
               style={[styles.feedbackBtn, feedback === "down" && styles.feedbackBtnDown]}
             >
               <Text style={styles.feedbackBtnEmoji}>👎</Text>
-              <Text style={[styles.feedbackBtnLabel, feedback === "down" && { color: COLORS.red }]}>
+              <Text style={[styles.feedbackBtnLabel, feedback === "down" && { color: COLORS.danger }]}>
                 No change
               </Text>
             </TouchableOpacity>
@@ -158,7 +158,7 @@ export default function ActivityScreen() {
             onPressOut={() => setVoiceActive(false)}
             style={[styles.voiceBtn, voiceActive && styles.voiceBtnActive]}
           >
-            <Text style={[styles.voiceBtnText, voiceActive && { color: COLORS.orange }]}>
+            <Text style={[styles.voiceBtnText, voiceActive && { color: COLORS.primary }]}>
               {voiceActive ? "🔴 Recording... release to stop" : "🎙 Voice note: Tremor? Mood? (1-5)"}
             </Text>
           </Pressable>
@@ -209,9 +209,9 @@ const styles = StyleSheet.create({
   benefitDetail: { fontSize: 12, color: COLORS.textMuted },
 
   primaryBtn: {
-    height: 60, borderRadius: 20, backgroundColor: COLORS.orange,
+    height: 60, borderRadius: 20, backgroundColor: COLORS.primary,
     alignItems: "center", justifyContent: "center",
-    shadowColor: COLORS.orange, shadowOffset: { width: 0, height: 12 },
+    shadowColor: COLORS.primary, shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.4, shadowRadius: 20, elevation: 8,
   },
   primaryBtnText: { fontSize: 18, fontWeight: "800", color: "#fff" },
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.cardBorder,
     alignItems: "center", justifyContent: "center",
   },
-  pauseBtnActive: { backgroundColor: COLORS.orange },
+  pauseBtnActive: { backgroundColor: COLORS.primary },
   pauseBtnText: { fontSize: 16, fontWeight: "700", color: COLORS.textMuted },
 
   feedbackHero: { alignItems: "center", paddingTop: 20, gap: 8 },
@@ -249,8 +249,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card, borderWidth: 2, borderColor: COLORS.cardBorder,
     alignItems: "center", justifyContent: "center", gap: 6,
   },
-  feedbackBtnUp: { backgroundColor: COLORS.green + "22", borderColor: COLORS.green },
-  feedbackBtnDown: { backgroundColor: COLORS.red + "22", borderColor: COLORS.red },
+  feedbackBtnUp: { backgroundColor: COLORS.success + "22", borderColor: COLORS.success },
+  feedbackBtnDown: { backgroundColor: COLORS.danger + "22", borderColor: COLORS.danger },
   feedbackBtnEmoji: { fontSize: 36 },
   feedbackBtnLabel: { fontSize: 12, fontWeight: "700", color: COLORS.textMuted },
   voiceBtn: {
@@ -258,6 +258,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card, borderWidth: 2, borderColor: COLORS.cardBorder,
     alignItems: "center", justifyContent: "center",
   },
-  voiceBtnActive: { backgroundColor: COLORS.orangeGlow, borderColor: COLORS.orange },
+  voiceBtnActive: { backgroundColor: COLORS.primaryGlow, borderColor: COLORS.primary },
   voiceBtnText: { fontSize: 15, fontWeight: "700", color: COLORS.textMuted },
 });

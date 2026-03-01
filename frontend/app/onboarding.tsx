@@ -6,45 +6,101 @@ import {
   TextInput,
   ScrollView,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { router } from "expo-router";
 import { COLORS } from "@/constants/colors";
 import { Btn, PermCard, SectionTitle } from "@/components/ui/UIComponents";
+import { createUser } from "@/api/user";
+import { setUserId } from "@/storage/user";
 
 export default function OnboardingScreen() {
   const [step, setStep] = useState(0);
-  const [tremorScore, setTremorScore] = useState(0);
-  const [permGranted, setPermGranted] = useState(false);
 
-  const goNext = () => {
+  // NEW: user fields
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState(""); // optional, not sent yet if backend doesn't accept
+  const [creatingUser, setCreatingUser] = useState(false);
+
+  const [tremorScore, setTremorScore] = React.useState<number | null>(null);
+  const [permGranted, setPermGranted] = useState(false);
+  const [lastMed, setLastMed] = React.useState("");
+  const [sleep, setSleep] = useState("");
+
+  const goNext = async () => {
+    if (step === 0) {
+      if (!name.trim()) return;
+
+      try {
+        setCreatingUser(true);
+        const res = await createUser(name.trim(), email.trim() || undefined);
+        await setUserId(res.user_id);
+        setStep(1);
+      } catch (e: any) {
+        Alert.alert("Could not create account", e?.message ?? "Try again");
+      } finally {
+        setCreatingUser(false);
+      }
+      return;
+    }
+
+    // existing flow untouched
     if (step < 3) setStep(step + 1);
     else router.replace("/");
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Step 0 – Welcome */}
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Step 0 – Welcome + user fields */}
         {step === 0 && (
           <View style={styles.centered}>
             <View style={styles.logoBox}>
               <Text style={styles.logoEmoji}>🧠</Text>
             </View>
+
             <Text style={styles.welcomeTitle}>
-              Hi, I'm <Text style={{ color: COLORS.orange }}>Neuro</Text>
+              Hi, I'm <Text style={{ color: COLORS.primary }}>CureMotion</Text>
             </Text>
+
             <Text style={styles.welcomeSub}>
-              I'll help manage your Parkinson's with smart, personalized activity
-              suggestions — learning what works best for you.
+              I'll help manage your Parkinson's with smart, personalized activity suggestions — learning what works best for you.
             </Text>
-            <Btn label="Let's get started →" onPress={goNext} />
+
+            {/* NEW: input card */}
+            <View style={styles.userCard}>
+              <Text style={styles.inputLabel}>Your name</Text>
+              <TextInput
+                placeholder="e.g., Your Name"
+                placeholderTextColor={COLORS.textMuted}
+                style={styles.inputField}
+                value={name}
+                onChangeText={setName}
+              />
+
+              <View style={{ height: 12 }} />
+
+              <Text style={styles.inputLabel}>Email (optional)</Text>
+              <TextInput
+                placeholder="e.g., example@email.com"
+                placeholderTextColor={COLORS.textMuted}
+                style={styles.inputField}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
+
+            <Btn
+              label={creatingUser ? "Creating..." : "Let's get started →"}
+              onPress={goNext}
+              disabled={creatingUser || !name.trim()}
+            />
           </View>
         )}
 
-        {/* Step 1 – Permissions */}
+        {/* Step 1 – Permissions (unchanged) */}
         {step === 1 && (
           <View style={styles.step}>
             <SectionTitle icon="🔗" title="Connect your devices" sub="For the best recommendations" />
@@ -56,7 +112,7 @@ export default function OnboardingScreen() {
           </View>
         )}
 
-        {/* Step 2 – Baseline */}
+        {/* Step 2 – Baseline (only fix: trim() bug) */}
         {step === 2 && (
           <View style={styles.step}>
             <SectionTitle icon="📊" title="Quick baseline check" sub="Takes 30 seconds" />
@@ -69,7 +125,7 @@ export default function OnboardingScreen() {
                     onPress={() => setTremorScore(n)}
                     style={[styles.scoreBtn, tremorScore === n && styles.scoreBtnActive]}
                   >
-                    <Text style={[styles.scoreBtnText, tremorScore === n && { color: COLORS.orange }]}>
+                    <Text style={[styles.scoreBtnText, tremorScore === n && { color: COLORS.primary }]}>
                       {n}
                     </Text>
                   </TouchableOpacity>
@@ -80,31 +136,48 @@ export default function OnboardingScreen() {
                 <Text style={styles.scoreLabel}>Severe</Text>
               </View>
             </View>
+
             <View style={styles.inputRow}>
               <View style={styles.smallInput}>
                 <Text style={styles.inputLabel}>💊 Last med</Text>
-                <TextInput placeholder="9:00 AM" placeholderTextColor={COLORS.textMuted} style={styles.inputField} />
+                <TextInput
+                  placeholder="9:00 AM"
+                  placeholderTextColor={COLORS.textMuted}
+                  value={lastMed}
+                  onChangeText={setLastMed}
+                  style={styles.inputField}
+                />
               </View>
               <View style={styles.smallInput}>
                 <Text style={styles.inputLabel}>😴 Sleep</Text>
-                <TextInput placeholder="7h 30m" placeholderTextColor={COLORS.textMuted} style={styles.inputField} />
+                <TextInput
+                  placeholder="7h 30m"
+                  placeholderTextColor={COLORS.textMuted}
+                  style={styles.inputField}
+                  value={sleep}
+                  onChangeText={setSleep}
+                />
               </View>
             </View>
+
             <View style={{ flex: 1 }} />
-            <Btn label="Build my plan →" onPress={goNext} disabled={!tremorScore} />
+            <Btn
+              label="Build my plan →"
+              onPress={goNext}
+              disabled={!tremorScore || !lastMed.trim() || !sleep.trim()}
+            />
           </View>
         )}
 
-        {/* Step 3 – First Rec */}
+        {/* Step 3 – unchanged */}
         {step === 3 && (
           <View style={styles.step}>
             <View style={styles.centered}>
               <Text style={styles.doneEmoji}>✨</Text>
               <Text style={styles.doneTitle}>Your plan is ready!</Text>
-              <Text style={styles.doneSub}>
-                Based on your input, here's your first recommendation
-              </Text>
+              <Text style={styles.doneSub}>Based on your input, here's your first recommendation</Text>
             </View>
+
             <View style={styles.recCard}>
               <Text style={styles.recTag}>🎯 Start now</Text>
               <Text style={styles.recName}>Seated Arm Circles</Text>
@@ -113,6 +186,7 @@ export default function OnboardingScreen() {
                 <Text style={styles.recBtnText}>▶ START 2:00</Text>
               </TouchableOpacity>
             </View>
+
             <TouchableOpacity onPress={goNext} style={styles.skipBtn}>
               <Text style={styles.skipText}>Skip to home screen</Text>
             </TouchableOpacity>
@@ -129,16 +203,22 @@ export default function OnboardingScreen() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.bg },
   content: { flexGrow: 1, padding: 24, paddingBottom: 40 },
   centered: { alignItems: "center", justifyContent: "center", paddingVertical: 32, gap: 20 },
   step: { flex: 1, gap: 20 },
-
+  userCard: {
+    width: "100%",
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
+    borderRadius: 20,
+    padding: 16,
+  },
   logoBox: {
     width: 100, height: 100, borderRadius: 30,
-    backgroundColor: COLORS.orange,
+    backgroundColor: COLORS.primary,
     alignItems: "center", justifyContent: "center",
   },
   logoEmoji: { fontSize: 44 },
@@ -155,7 +235,7 @@ const styles = StyleSheet.create({
     flex: 1, height: 52, borderRadius: 14, borderWidth: 2,
     borderColor: COLORS.cardBorder, alignItems: "center", justifyContent: "center",
   },
-  scoreBtnActive: { borderColor: COLORS.orange, backgroundColor: COLORS.orangeGlow },
+  scoreBtnActive: { borderColor: COLORS.primary, backgroundColor: COLORS.primaryGlow },
   scoreBtnText: { fontSize: 18, fontWeight: "800", color: COLORS.textSecondary },
   scoreLabels: { flexDirection: "row", justifyContent: "space-between", marginTop: 6 },
   scoreLabel: { fontSize: 11, color: COLORS.textMuted },
@@ -173,16 +253,16 @@ const styles = StyleSheet.create({
   doneSub: { fontSize: 14, color: COLORS.textSecondary, textAlign: "center" },
 
   recCard: {
-    borderWidth: 1.5, borderColor: COLORS.orange + "55",
+    borderWidth: 1.5, borderColor: COLORS.primary + "55",
     borderRadius: 24, padding: 24,
-    backgroundColor: COLORS.orangeGlow,
+    backgroundColor: COLORS.primaryGlow,
   },
-  recTag: { fontSize: 13, color: COLORS.orange, fontWeight: "700", letterSpacing: 1 },
+  recTag: { fontSize: 13, color: COLORS.primary, fontWeight: "700", letterSpacing: 1 },
   recName: { fontSize: 22, fontWeight: "800", color: COLORS.textPrimary, marginTop: 8 },
   recMeta: { fontSize: 14, color: COLORS.textSecondary, marginTop: 4 },
   recBtn: {
     marginTop: 20, height: 60, borderRadius: 18,
-    backgroundColor: COLORS.orange,
+    backgroundColor: COLORS.primary,
     alignItems: "center", justifyContent: "center",
   },
   recBtnText: { fontSize: 18, fontWeight: "800", color: "#fff" },
@@ -192,5 +272,5 @@ const styles = StyleSheet.create({
 
   dots: { flexDirection: "row", justifyContent: "center", gap: 8, marginTop: 24 },
   dot: { width: 8, height: 8, borderRadius: 99, backgroundColor: COLORS.cardBorder },
-  dotActive: { width: 24, backgroundColor: COLORS.orange },
+  dotActive: { width: 24, backgroundColor: COLORS.primary },
 });

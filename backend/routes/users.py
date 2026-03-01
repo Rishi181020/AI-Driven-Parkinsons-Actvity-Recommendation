@@ -7,6 +7,7 @@ router = APIRouter()
 
 @router.post("/users")
 def create_user(payload: dict, session: Session = Depends(get_session)):
+    print("got called")
     user = User(display_name=payload["display_name"])
     session.add(user)
     session.commit()
