@@ -12,7 +12,9 @@ import { router } from "expo-router";
 import { COLORS } from "@/constants/colors";
 import { Btn, PermCard, SectionTitle } from "@/components/ui/UIComponents";
 import { createUser } from "@/api/user";
-import { setUserId } from "@/storage/user";
+import { setUser } from "@/storage/user";
+import { Audio } from "expo-av";
+import { createInfer } from "@/api/infer";
 
 export default function OnboardingScreen() {
   const [step, setStep] = useState(0);
@@ -26,6 +28,21 @@ export default function OnboardingScreen() {
   const [permGranted, setPermGranted] = useState(false);
   const [lastMed, setLastMed] = React.useState("");
   const [sleep, setSleep] = useState("");
+  const [micGranted, setMicGranted] = useState(false);
+
+
+  async function requestMicrophone() {
+    try {
+      const { status } = await Audio.requestPermissionsAsync();
+      const ok = status === "granted";
+      setMicGranted(ok);
+      if (!ok) Alert.alert("Microphone not enabled", "You can enable it later in Settings.");
+    } catch (e) {
+      Alert.alert("Error", "Could not request microphone permission.");
+    }
+  }
+
+
 
   const goNext = async () => {
     if (step === 0) {
@@ -34,7 +51,8 @@ export default function OnboardingScreen() {
       try {
         setCreatingUser(true);
         const res = await createUser(name.trim(), email.trim() || undefined);
-        await setUserId(res.user_id);
+        console.log(name.trim())
+        await setUser(res.user_id, name.trim());
         setStep(1);
       } catch (e: any) {
         Alert.alert("Could not create account", e?.message ?? "Try again");
@@ -43,7 +61,16 @@ export default function OnboardingScreen() {
       }
       return;
     }
-
+    if (step === 2) {
+      try {
+        const result = await createInfer();
+        console.log("INFER RESULT:", result);
+        setStep(3);
+      } catch (e) {
+        console.log("ERROR:", e);
+      }
+      return;
+    }
     // existing flow untouched
     if (step < 3) setStep(step + 1);
     else router.replace("/");
@@ -105,8 +132,7 @@ export default function OnboardingScreen() {
           <View style={styles.step}>
             <SectionTitle icon="🔗" title="Connect your devices" sub="For the best recommendations" />
             <PermCard icon="⌚" title="Wearable Device" sub="Detects tremor & movement in real-time" granted={permGranted} onGrant={() => setPermGranted(true)} />
-            <PermCard icon="🔔" title="Notifications" sub="Get real-time activity reminders" granted={false} onGrant={() => { }} />
-            <PermCard icon="🎙️" title="Microphone" sub="Voice-first interaction" granted={false} onGrant={() => { }} />
+            <PermCard icon="🎙️" title="Microphone" sub="Voice-first interaction" granted={micGranted} onGrant={requestMicrophone} />
             <View style={{ flex: 1 }} />
             <Btn label={permGranted ? "Continue →" : "Skip for now"} onPress={goNext} secondary={!permGranted} />
           </View>
@@ -207,7 +233,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.bg },
   content: { flexGrow: 1, padding: 24, paddingBottom: 40 },
   centered: { alignItems: "center", justifyContent: "center", paddingVertical: 32, gap: 20 },
-  step: { flex: 1, gap: 20 },
+  step: { flex: 1, gap: 20, paddingTop: 20 },
   userCard: {
     width: "100%",
     backgroundColor: COLORS.card,
