@@ -56,7 +56,7 @@ def startup_event():
     # Using n_gpu_layers=10 to save some VRAM for the LSTM model
     llm_path = "./models/medgemma-4b-it-q8_0.gguf"
     if os.path.exists(llm_path):
-        _LLM = Llama(model_path=llm_path, n_gpu_layers=-1, n_ctx=4096, verbose=False)
+        _LLM = Llama(model_path=llm_path, n_gpu_layers=0, n_ctx=4096, verbose=False)
 
 
 @app.get("/health")
