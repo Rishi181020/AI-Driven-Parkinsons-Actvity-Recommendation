@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { COLORS } from "@/constants/colors";
-import { AppStatusBar } from "@/components/ui/UIComponents";
 import { SettingsGroup, SettingsRow, SettingsToggle } from "@/components/ui/settingsComponents";
 
 export default function SettingsScreen() {
@@ -17,7 +16,6 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <AppStatusBar />
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>

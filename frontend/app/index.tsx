@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { COLORS } from "@/constants/colors";
-import { AppStatusBar,MetricChip,TremorBar,PermCard, QuickAction } from "@/components/ui/UIComponents";
+import { MetricChip, TremorBar, PermCard, QuickAction } from "@/components/ui/UIComponents";
 import { TodayCard } from "@/components/cards/TodayCard";
 import { CurrentRecCard } from "@/components/cards/CurrentRecCard";
 import { TrendCard } from "@/components/cards/TrendCard";
@@ -29,7 +29,6 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <AppStatusBar />
 
       {/* Header */}
       <View style={styles.header}>
@@ -113,6 +112,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 24,
     paddingBottom: 12,
+    paddingTop: 38
   },
   greeting: { fontSize: 13, color: COLORS.textMuted },
   name: { fontSize: 22, fontWeight: "800", color: COLORS.textPrimary },
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 
-  chatBubbleWrapper: { position: "absolute", bottom: 32, right: 24 },
+  chatBubbleWrapper: { position: "absolute", bottom: 80, right: 24 },
   chatBubble: {
     width: 60, height: 60, borderRadius: 99,
     backgroundColor: COLORS.orange,

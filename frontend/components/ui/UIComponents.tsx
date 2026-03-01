@@ -4,12 +4,12 @@ import { COLORS } from "@/constants/colors";
 import { TremorLevel } from "@/constants/types";
 
 // ── StatusBar ────────────────────────────────────────────────────────────────
-export const AppStatusBar = () => (
-  <View style={styles.statusBar}>
-    <Text style={styles.statusTime}>9:41</Text>
-    <Text style={styles.statusText}>●●● WiFi ⚡ 87%</Text>
-  </View>
-);
+// export const AppStatusBar = () => (
+//   <View style={styles.statusBar}>
+//     <Text style={styles.statusTime}>9:41</Text>
+//     <Text style={styles.statusText}>●●● WiFi ⚡ 87%</Text>
+//   </View>
+// );
 
 // ── Primary Button ────────────────────────────────────────────────────────────
 interface BtnProps {

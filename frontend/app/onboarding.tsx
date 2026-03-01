@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { COLORS } from "@/constants/colors";
-import { AppStatusBar,Btn,PermCard,SectionTitle } from "@/components/ui/UIComponents";
+import { Btn, PermCard, SectionTitle } from "@/components/ui/UIComponents";
 
 export default function OnboardingScreen() {
   const [step, setStep] = useState(0);
@@ -18,12 +18,11 @@ export default function OnboardingScreen() {
 
   const goNext = () => {
     if (step < 3) setStep(step + 1);
-    else router.replace("/(tabs)");
+    else router.replace("/");
   };
 
   return (
     <View style={styles.container}>
-      <AppStatusBar />
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -50,8 +49,8 @@ export default function OnboardingScreen() {
           <View style={styles.step}>
             <SectionTitle icon="🔗" title="Connect your devices" sub="For the best recommendations" />
             <PermCard icon="⌚" title="Wearable Device" sub="Detects tremor & movement in real-time" granted={permGranted} onGrant={() => setPermGranted(true)} />
-            <PermCard icon="🔔" title="Notifications" sub="Get real-time activity reminders" granted={false} onGrant={() => {}} />
-            <PermCard icon="🎙️" title="Microphone" sub="Voice-first interaction" granted={false} onGrant={() => {}} />
+            <PermCard icon="🔔" title="Notifications" sub="Get real-time activity reminders" granted={false} onGrant={() => { }} />
+            <PermCard icon="🎙️" title="Microphone" sub="Voice-first interaction" granted={false} onGrant={() => { }} />
             <View style={{ flex: 1 }} />
             <Btn label={permGranted ? "Continue →" : "Skip for now"} onPress={goNext} secondary={!permGranted} />
           </View>

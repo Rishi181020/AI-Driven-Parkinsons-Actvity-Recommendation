@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import React from "react";
 
 export default function RootLayout() {
   return (
@@ -13,7 +14,7 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="onboarding" />
-        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="index" />
         <Stack.Screen name="activity" options={{ animation: "slide_from_bottom" }} />
         <Stack.Screen name="chat" options={{ animation: "slide_from_bottom" }} />
         <Stack.Screen name="settings" />

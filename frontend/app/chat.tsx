@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { COLORS } from "@/constants/colors";
-import { AppStatusBar } from "@/components/ui/UIComponents";
 import { Message } from "@/constants/types";
 
 const INITIAL_MESSAGES: Message[] = [
@@ -67,8 +66,6 @@ export default function ChatScreen() {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <AppStatusBar />
-
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -177,7 +174,7 @@ const styles = StyleSheet.create({
 
   header: {
     flexDirection: "row", alignItems: "center",
-    paddingHorizontal: 20, paddingBottom: 12,
+    paddingHorizontal: 20, paddingTop: 36,
   },
   backBtn: {
     width: 40, height: 40, borderRadius: 14,
@@ -209,7 +206,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     borderRadius: 18, borderTopRightRadius: 4,
   },
-   bubbleAgent: {
+  bubbleAgent: {
     backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.cardBorder,
     borderTopLeftRadius: 4,
   },
@@ -241,7 +238,7 @@ const styles = StyleSheet.create({
 
   inputBar: {
     flexDirection: "row", gap: 10, alignItems: "center",
-    padding: 12, paddingHorizontal: 16, paddingBottom: 32,
+    padding: 12, paddingHorizontal: 16, paddingBottom: 40,
   },
   modeBtn: {
     width: 44, height: 44, borderRadius: 14,

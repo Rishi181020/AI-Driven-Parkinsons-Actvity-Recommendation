@@ -9,7 +9,6 @@ import {
 import { router } from "expo-router";
 import Svg, { Circle } from "react-native-svg";
 import { COLORS } from "@/constants/colors";
-import { AppStatusBar } from "@/components/ui/UIComponents";
 import { useTimer } from "@/hooks/useTimer";
 
 type Phase = "detail" | "timer" | "feedback";
@@ -36,8 +35,6 @@ export default function ActivityScreen() {
 
   return (
     <View style={styles.container}>
-      <AppStatusBar />
-
       {/* Back header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -167,7 +164,7 @@ export default function ActivityScreen() {
           </Pressable>
 
           <View style={{ flex: 1 }} />
-          <TouchableOpacity onPress={() => router.replace("/(tabs)")} style={styles.primaryBtn} activeOpacity={0.85}>
+          <TouchableOpacity onPress={() => router.replace("/")} style={styles.primaryBtn} activeOpacity={0.85}>
             <Text style={styles.primaryBtnText}>Next Recommendation →</Text>
           </TouchableOpacity>
         </View>
