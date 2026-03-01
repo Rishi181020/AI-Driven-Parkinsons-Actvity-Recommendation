@@ -1,6 +1,5 @@
-docker run --rm -p 8001:8000 \
-  --device=/dev/kfd --device=/dev/dri \
-  --group-add video \
-  --ipc=host --shm-size=8g \
+docker run -d --name parkinsons-api \
+  -p 8001:8000 \
+  -v /root/AI-Driven-Parkinsons-Actvity-Recommendation/models:/app/models \
   parkinsons-infer
   

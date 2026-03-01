@@ -10,6 +10,10 @@ Reads wearable sensor data in real time, detects freezing-of-gait (FOG) severity
 - **Backend** — FastAPI + SQLModel + SQLite
 - **Frontend** — React Native (Expo)
 
+<p align="center">
+  <img src="system design.png" width="1000"/>
+</p>
+
 ## Dataset
 [Parkinson's Freezing of Gait Prediction](https://www.kaggle.com/competitions/tlvmc-parkinsons-freezing-gait-prediction) — clinical wearable accelerometer data with freezing-of-gait annotations. Underrepresented activity classes were balanced using Gaussian perturbation to generate synthetic samples.
 
