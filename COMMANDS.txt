@@ -1,0 +1,6 @@
+docker run --rm -p 8001:8000 \
+  --device=/dev/kfd --device=/dev/dri \
+  --group-add video \
+  --ipc=host --shm-size=8g \
+  parkinsons-infer
+  
