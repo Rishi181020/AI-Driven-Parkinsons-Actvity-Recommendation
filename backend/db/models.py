@@ -42,3 +42,29 @@ class BanditStat(SQLModel, table=True):
     activity_id: str
     n: int = 0
     success_n: int = 0
+
+class PredictionLog(SQLModel, table=True):
+    """Stores every LSTM prediction made for a user."""
+    id:                 Optional[int] = Field(default=None, primary_key=True)
+    user_id:            int
+    session_id:         str                          # ties prediction to chat history
+    predicted_activity: str                          # e.g. "Gait Training"
+    activity_id:        int                          # 0,1,2,3,4,6
+    confidence:         float
+    fog_severity:       float
+    movement_mag:       float
+    time_of_day:        float
+    caregiver_alerted:  bool = False
+    created_at:         datetime = Field(default_factory=datetime.utcnow)
+
+
+class ConversationMessage(SQLModel, table=True):
+    """Stores each message in a chat/voice session — replaces the in-memory dict."""
+    id:         Optional[int] = Field(default=None, primary_key=True)
+    user_id:    int
+    session_id: str
+    role:       str           # "system" | "user" | "assistant"
+    content:    str
+    source:     str = "text"  # "text" | "voice"
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
