@@ -6,16 +6,12 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from llama_cpp import Llama
 
-
 app = FastAPI(title="Parkinson Activity & Chat Assistant")
 
 import os
-# Prevent TensorFlow from pre-allocating all VRAM
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
-# Ensure AMD GPU is recognized correctly
 os.environ['HSA_OVERRIDE_GFX_VERSION'] = '10.3.0'
 
-# --- 1. CONFIG & CLASSES ---
 ENCODER_CLASSES = np.array([0, 1, 2, 3, 4, 6], dtype=np.int32)
 ID_TO_LABEL = {
     0: "Rest", 1: "Seated Exercise", 2: "Gait Training",
@@ -34,7 +30,6 @@ class InferResponse(BaseModel):
 class ChatRequest(BaseModel):
     message: str
 
-# --- 2. GLOBAL MODELS ---
 _MODEL: Optional[tf.keras.Model] = None
 _LLM: Optional[Llama] = None
 
@@ -57,7 +52,6 @@ def startup_event():
     if os.path.exists(llm_path):
         _LLM = Llama(model_path=llm_path, n_gpu_layers=-1, n_ctx=2048, verbose=False)
 
-# --- 3. ENDPOINTS ---
 
 @app.get("/health")
 def health():
@@ -94,7 +88,6 @@ def chat(req: ChatRequest):
     if _LLM is None:
         raise HTTPException(status_code=500, detail="Chat model not loaded")
 
-    # Prompt template for TinyLlama
     prompt = f"<|system|>\nYou are a Parkinson's assistant.</s>\n<|user|>\n{req.message}</s>\n<|assistant|>\n"
     
     output = _LLM(prompt, max_tokens=128, stop=["</s>"], echo=False)

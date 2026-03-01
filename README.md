@@ -19,6 +19,10 @@ A PyTorch activity classifier, and a vLLM-powered interface delivers these perso
 
 ## Architecture
 
+<p align="center">
+  <img src="system design.png" width="1000"/>
+</p>
+
 ## Dataset
 
 ### Source
