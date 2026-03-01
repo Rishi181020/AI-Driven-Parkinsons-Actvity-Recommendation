@@ -5,6 +5,8 @@ from contextlib import asynccontextmanager
 from websockets import route
 
 from routes import users
+from routes import predict
+from routes import chat
 from db.init_db import init_db
 
 
