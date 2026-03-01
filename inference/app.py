@@ -54,7 +54,7 @@ def startup_event():
     
     # Load TinyLlama Model (llama-cpp)
     # Using n_gpu_layers=10 to save some VRAM for the LSTM model
-    llm_path = "/app/models/medgemma-4b-it-q8_0.gguf"
+    llm_path = "./models/medgemma-4b-it-q8_0.gguf"
     if os.path.exists(llm_path):
         _LLM = Llama(model_path=llm_path, n_gpu_layers=-1, n_ctx=2048, verbose=False)
 
