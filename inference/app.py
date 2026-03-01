@@ -54,9 +54,9 @@ def startup_event():
     
     # Load TinyLlama Model (llama-cpp)
     # Using n_gpu_layers=10 to save some VRAM for the LSTM model
-    llm_path = "models/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf"
+    llm_path = "./models/medgemma-4b-it-q8_0.gguf"
     if os.path.exists(llm_path):
-        _LLM = Llama(model_path=llm_path, n_gpu_layers=-1, n_ctx=2048, verbose=False)
+        _LLM = Llama(model_path=llm_path, n_gpu_layers=0, n_ctx=3072, verbose=True)
 
 
 @app.get("/health")
@@ -159,7 +159,6 @@ def infer(req: InferRequest):
     LATEST_CTX = event
     HISTORY.append(event)
 
-    # ---- Response ----
     return InferResponse(
         probs=probs_1d.tolist(),
         pred_index=pred_index,
@@ -180,6 +179,8 @@ def chat(req: ChatRequest):
     prompt = f"""<|system|>
     You are a Parkinson's assistant. Use the provided sensor inference context to give safe, practical suggestions.
     If context is missing, ask 1 clarifying question.
+    You have to majorly answer based on a combination of latest research and the interpretation of the sensor
+    statistics.
     </s>
     <|user|>
     User message: {req.message}
