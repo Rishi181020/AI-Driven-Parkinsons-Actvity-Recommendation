@@ -1,98 +1,172 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  PanResponder,
+} from "react-native";
+import { router } from "expo-router";
+import { COLORS } from "@/constants/colors";
+import { AppStatusBar,MetricChip,TremorBar,PermCard, QuickAction } from "@/components/ui/UIComponents";
+import { TodayCard } from "@/components/cards/TodayCard";
+import { CurrentRecCard } from "@/components/cards/CurrentRecCard";
+import { TrendCard } from "@/components/cards/TrendCard";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const CARD_LABELS = ["TODAY", "NOW", "TREND"];
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const [cardIdx, setCardIdx] = useState(0);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const panResponder = PanResponder.create({
+    onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 10,
+    onPanResponderRelease: (_, g) => {
+      if (g.dx < -40) setCardIdx((i) => Math.min(i + 1, 2));
+      if (g.dx > 40) setCardIdx((i) => Math.max(i - 1, 0));
+    },
+  });
+
+  return (
+    <View style={styles.container}>
+      <AppStatusBar />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.greeting}>Good morning,</Text>
+          <Text style={styles.name}>
+            Michael <Text style={{ color: COLORS.orange }}>👋</Text>
+          </Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => router.push("/settings")}
+          style={styles.menuBtn}
+        >
+          <Text style={styles.menuIcon}>☰</Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Live Metrics */}
+        <View style={styles.metrics}>
+          <TremorBar level="HIGH" />
+          <MetricChip icon="👟" label="Steps" value="2.1k" color={COLORS.blue} />
+          <MetricChip icon="😴" label="Sleep" value="6h2m" color={COLORS.textSecondary} />
+        </View>
+
+        {/* Card Tab Switcher */}
+        <View style={styles.tabRow}>
+          {CARD_LABELS.map((l, i) => (
+            <TouchableOpacity
+              key={i}
+              onPress={() => setCardIdx(i)}
+              style={[styles.tab, cardIdx === i && styles.tabActive]}
+            >
+              <Text style={[styles.tabText, cardIdx === i && styles.tabTextActive]}>
+                {l}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Swipeable Card */}
+        <View style={styles.cardContainer} {...panResponder.panHandlers}>
+          {cardIdx === 0 && <TodayCard />}
+          {cardIdx === 1 && <CurrentRecCard />}
+          {cardIdx === 2 && <TrendCard />}
+        </View>
+
+        {/* Quick Actions */}
+        <View style={styles.quickActions}>
+          <QuickAction icon="💊" label="Log Meds" />
+          <QuickAction icon="📝" label="Track" />
+          <QuickAction icon="👥" label="Caregiver" />
+          <QuickAction icon="📈" label="History" />
+        </View>
+
+        <View style={{ height: 100 }} />
+      </ScrollView>
+
+      {/* Floating Chat Bubble */}
+      <View style={styles.chatBubbleWrapper}>
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>3</Text>
+        </View>
+        <TouchableOpacity
+          onPress={() => router.push("/chat")}
+          style={styles.chatBubble}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.chatBubbleIcon}>👋</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    paddingBottom: 12,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  greeting: { fontSize: 13, color: COLORS.textMuted },
+  name: { fontSize: 22, fontWeight: "800", color: COLORS.textPrimary },
+  menuBtn: {
+    width: 42, height: 42, borderRadius: 14,
+    backgroundColor: COLORS.card, borderWidth: 1,
+    borderColor: COLORS.cardBorder,
+    alignItems: "center", justifyContent: "center",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  menuIcon: { fontSize: 18, color: COLORS.textSecondary },
+
+  metrics: {
+    flexDirection: "row",
+    gap: 10,
+    paddingHorizontal: 20,
+    marginBottom: 16,
   },
+
+  tabRow: { flexDirection: "row", gap: 8, paddingHorizontal: 20, marginBottom: 12 },
+  tab: {
+    flex: 1, height: 30, borderRadius: 10,
+    backgroundColor: COLORS.card,
+    borderWidth: 1, borderColor: COLORS.cardBorder,
+    alignItems: "center", justifyContent: "center",
+  },
+  tabActive: { backgroundColor: COLORS.orange, borderColor: COLORS.orange },
+  tabText: { fontSize: 11, fontWeight: "700", letterSpacing: 0.5, color: COLORS.textMuted },
+  tabTextActive: { color: "#fff" },
+
+  cardContainer: { paddingHorizontal: 20, marginBottom: 16 },
+
+  quickActions: {
+    flexDirection: "row",
+    gap: 10,
+    paddingHorizontal: 20,
+  },
+
+  chatBubbleWrapper: { position: "absolute", bottom: 32, right: 24 },
+  chatBubble: {
+    width: 60, height: 60, borderRadius: 99,
+    backgroundColor: COLORS.orange,
+    alignItems: "center", justifyContent: "center",
+    shadowColor: COLORS.orange,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    elevation: 12,
+  },
+  chatBubbleIcon: { fontSize: 22 },
+  badge: {
+    position: "absolute", top: -8, right: -4, zIndex: 1,
+    width: 18, height: 18, borderRadius: 99,
+    backgroundColor: COLORS.red,
+    alignItems: "center", justifyContent: "center",
+  },
+  badgeText: { fontSize: 11, fontWeight: "800", color: "#fff" },
 });
