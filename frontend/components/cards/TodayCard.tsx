@@ -1,43 +1,76 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { COLORS } from "@/constants/colors";
-import { Activity } from "@/constants/types";
 import { router } from "expo-router";
+import { getInferResult } from "@/storage/useInfer";
 
-const activities: Activity[] = [
-  { time: "8:00 AM", name: "Gait Training", icon: "🚶", color: COLORS.secondary },
-  { time: "10:00 AM", name: "Stretching", icon: "🧘", color: COLORS.success },
-  { time: "12:00 PM", name: "Breathing", icon: "💨", color: COLORS.warning },
-];
+type InferResult = {
+  pred_label?: string;
+  pred_index?: number;
+  probs?: number[];
+};
 
-export const TodayCard = () => (
-  <View style={styles.card}>
-    <Text style={styles.tag}>📅 TODAY'S PLAN</Text>
-    <Text style={styles.subtitle}>
-      Morning tremor detected → 3 activities to start strong
-    </Text>
-    {activities.map((a, i) => (
+export const TodayCard = () => {
+  const [inferResult, setInferResult] = React.useState<InferResult | null>(null);
+
+  React.useEffect(() => {
+    (async () => {
+      const r = await getInferResult();
+      setInferResult(r);
+      return r
+    })();
+  }, []);
+  console.log(inferResult)
+  const label = inferResult?.pred_label ?? "No plan yet";
+  const confidence =
+    inferResult?.probs && typeof inferResult?.pred_index === "number"
+      ? Math.round((inferResult.probs[inferResult.pred_index] ?? 0) * 100)
+      : null;
+
+  return (
+    <View style={styles.card}>
+      <Text style={styles.tag}>📅 TODAY'S PLAN</Text>
+
+      <Text style={styles.subtitle}>
+        {inferResult?.pred_label
+          ? `Recommended activity${confidence !== null ? ` • ${confidence}% confidence` : ""}`
+          : "Run onboarding to generate your plan"}
+      </Text>
+
       <TouchableOpacity
-        key={i}
         onPress={() => router.push("/activity")}
-        style={[styles.row, i < 2 && styles.rowBorder]}
+        style={styles.row}
         activeOpacity={0.7}
+        disabled={!inferResult?.pred_label}
       >
-        <View style={[styles.iconBox, { backgroundColor: a.color + "22", borderColor: a.color + "44" }]}>
-          <Text style={styles.activityIcon}>{a.icon}</Text>
+        <View
+          style={[
+            styles.iconBox,
+            {
+              backgroundColor: COLORS.primary + "22",
+              borderColor: COLORS.primary + "44",
+            },
+          ]}
+        >
+          <Text style={styles.activityIcon}>🎯</Text>
         </View>
+
         <View style={styles.rowInfo}>
-          <Text style={styles.activityName}>{a.name}</Text>
-          <Text style={styles.activityTime}>{a.time}</Text>
+          <Text style={styles.activityName}>{label}</Text>
+          <Text style={styles.activityTime}>
+            {inferResult?.pred_label ? "Start now" : "Complete onboarding"}
+          </Text>
         </View>
-        <Text style={[styles.playBtn, { color: a.color }]}>▶</Text>
+
+        <Text style={[styles.playBtn, { color: COLORS.primary }]}>▶</Text>
       </TouchableOpacity>
-    ))}
-    <TouchableOpacity style={styles.explainBtn} activeOpacity={0.7}>
-      <Text style={styles.explainText}>🎙 Explain why?</Text>
-    </TouchableOpacity>
-  </View>
-);
+
+      <TouchableOpacity style={styles.explainBtn} activeOpacity={0.7} disabled={!inferResult?.pred_label}>
+        <Text style={styles.explainText}>🎙 Explain why?</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   card: {
@@ -55,7 +88,6 @@ const styles = StyleSheet.create({
     gap: 14,
     paddingVertical: 12,
   },
-  rowBorder: { borderBottomWidth: 1, borderBottomColor: COLORS.cardBorder },
   iconBox: {
     width: 40,
     height: 40,
