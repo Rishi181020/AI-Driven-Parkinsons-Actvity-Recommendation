@@ -33,7 +33,7 @@ def _load_model() -> None:
         raise RuntimeError(
             f"Model file not found at '{model_path}'. Set MODEL_PATH or copy fog_6class_lstm.keras into the container."
         )
-    _MODEL = tf.keras.models.load_model(model_path)
+    _MODEL = tf.keras.models.load_model(model_path, safe_mode=False)
 
 
 @app.get("/health")
