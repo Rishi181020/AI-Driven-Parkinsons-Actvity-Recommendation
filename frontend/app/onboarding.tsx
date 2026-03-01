@@ -15,6 +15,7 @@ import { createUser } from "@/api/user";
 import { setUser } from "@/storage/user";
 import { Audio } from "expo-av";
 import { createInfer } from "@/api/infer";
+import { setInferResult } from "@/storage/useInfer";
 
 export default function OnboardingScreen() {
   const [step, setStep] = useState(0);
@@ -23,7 +24,6 @@ export default function OnboardingScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState(""); // optional, not sent yet if backend doesn't accept
   const [creatingUser, setCreatingUser] = useState(false);
-
   const [tremorScore, setTremorScore] = React.useState<number | null>(null);
   const [permGranted, setPermGranted] = useState(false);
   const [lastMed, setLastMed] = React.useState("");
@@ -64,7 +64,7 @@ export default function OnboardingScreen() {
     if (step === 2) {
       try {
         const result = await createInfer();
-        console.log("INFER RESULT:", result);
+        await setInferResult(result);
         setStep(3);
       } catch (e) {
         console.log("ERROR:", e);
