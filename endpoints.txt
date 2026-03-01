@@ -1,0 +1,13 @@
+Example Inference:
+
+```
+import requests
+
+url = "http://134.199.195.86:8001/infer"
+
+x = [[0.0, 0.0, 0.0] for _ in range(100)]
+
+response = requests.post(url, json={"x": x})
+print(response.status_code)
+print(response.json())
+```
