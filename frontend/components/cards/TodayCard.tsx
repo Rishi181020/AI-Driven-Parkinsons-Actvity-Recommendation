@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { COLORS } from "@/constants/colors";
 import { router } from "expo-router";
 import { getInferResult } from "@/storage/useInfer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type InferResult = {
   pred_label?: string;
@@ -10,8 +11,19 @@ type InferResult = {
   probs?: number[];
 };
 
-export const TodayCard = () => {
+interface Props {
+  refreshKey?: number;
+}
+
+export const TodayCard = ({ refreshKey }: Props) => {
   const [inferResult, setInferResult] = React.useState<InferResult | null>(null);
+
+  React.useEffect(() => {
+    (async () => {
+      const r = await getInferResult();
+      setInferResult(r);
+    })();
+  }, [refreshKey]);
 
   React.useEffect(() => {
     (async () => {
@@ -20,7 +32,6 @@ export const TodayCard = () => {
       return r
     })();
   }, []);
-  console.log(inferResult)
   const label = inferResult?.pred_label ?? "No plan yet";
   const confidence =
     inferResult?.probs && typeof inferResult?.pred_index === "number"
@@ -38,7 +49,16 @@ export const TodayCard = () => {
       </Text>
 
       <TouchableOpacity
-        onPress={() => router.push("/activity")}
+        onPress={() => {
+          router.push({
+            pathname: "/activity",
+            params: {
+              rec: JSON.stringify(inferResult),
+            },
+          })
+        }
+
+        }
         style={styles.row}
         activeOpacity={0.7}
         disabled={!inferResult?.pred_label}
@@ -65,10 +85,13 @@ export const TodayCard = () => {
         <Text style={[styles.playBtn, { color: COLORS.primary }]}>▶</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.explainBtn} activeOpacity={0.7} disabled={!inferResult?.pred_label}>
+      <TouchableOpacity style={styles.explainBtn} activeOpacity={0.7} disabled={!inferResult?.pred_label} onPress={async () => {
+        await AsyncStorage.setItem("pending_message", "Explain why you recommended this activity for me");
+        router.push("/chat");
+      }}>
         <Text style={styles.explainText}>🎙 Explain why?</Text>
       </TouchableOpacity>
-    </View>
+    </View >
   );
 };
 

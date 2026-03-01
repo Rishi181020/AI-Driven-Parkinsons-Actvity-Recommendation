@@ -87,7 +87,7 @@ export default function OnboardingScreen() {
             </View>
 
             <Text style={styles.welcomeTitle}>
-              Hi, I'm <Text style={{ color: COLORS.primary }}>CureMotion</Text>
+              Hi, I'm <Text style={{ color: COLORS.primary }}>HealinMotion</Text>
             </Text>
 
             <Text style={styles.welcomeSub}>

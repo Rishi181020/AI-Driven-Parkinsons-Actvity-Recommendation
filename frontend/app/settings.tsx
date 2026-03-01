@@ -70,7 +70,7 @@ export default function SettingsScreen() {
           <SettingsRow icon="🔒" label="Data Sharing" value="Anonymized only" />
         </SettingsGroup>
 
-        <Text style={styles.version}>CureMotion v1.0.0 • Built with ❤️ for Parkinson's care</Text>
+        <Text style={styles.version}>HealinMotion v1.0.0 • Built with ❤️ for Parkinson's care</Text>
         <View style={{ height: 40 }} />
       </ScrollView>
     </View>

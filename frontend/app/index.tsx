@@ -13,15 +13,18 @@ import { MetricChip, TremorBar, PermCard, QuickAction } from "@/components/ui/UI
 import { TodayCard } from "@/components/cards/TodayCard";
 import { CurrentRecCard } from "@/components/cards/CurrentRecCard";
 import { TrendCard } from "@/components/cards/TrendCard";
-import { getUsername } from "@/storage/user";
 import { useUsername } from "@/hooks/useUser";
+import { RefreshControl } from "react-native";
+import { createInfer } from "@/api/infer";
+import { setInferResult } from "@/storage/useInfer";
 
 const CARD_LABELS = ["TODAY", "NOW", "TREND"];
 
 
 export default function HomeScreen() {
   const [cardIdx, setCardIdx] = useState(0);
-
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const username = useUsername();
   const panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 10,
@@ -30,6 +33,19 @@ export default function HomeScreen() {
       if (g.dx > 40) setCardIdx((i) => Math.max(i - 1, 0));
     },
   });
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const result = await createInfer();
+      await setInferResult(result);
+      setRefreshKey(k => k + 1); // ← triggers TodayCard to re-fetch
+    } catch (e) {
+      console.log("Refresh error:", e);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -50,7 +66,14 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={COLORS.primary}
+          colors={[COLORS.primary]}
+        />
+      }>
         {/* Live Metrics */}
         <View style={styles.metrics}>
           <TremorBar level="HIGH" />
@@ -75,17 +98,7 @@ export default function HomeScreen() {
 
         {/* Swipeable Card */}
         <View style={styles.cardContainer} {...panResponder.panHandlers}>
-          {cardIdx === 0 && <TodayCard />}
-          {cardIdx === 1 && <CurrentRecCard />}
-          {cardIdx === 2 && <TrendCard />}
-        </View>
-
-        {/* Quick Actions */}
-        <View style={styles.quickActions}>
-          <QuickAction icon="💊" label="Log Meds" />
-          <QuickAction icon="📝" label="Track" />
-          <QuickAction icon="👥" label="Caregiver" />
-          <QuickAction icon="📈" label="History" />
+          {cardIdx === 0 && <TodayCard refreshKey={refreshKey} />}
         </View>
 
         <View style={{ height: 100 }} />

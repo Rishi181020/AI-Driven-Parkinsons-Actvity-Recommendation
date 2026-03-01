@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   View,
   Text,
@@ -7,75 +8,141 @@ import {
   ScrollView,
   Pressable,
   StyleSheet,
-  KeyboardAvoidingView,
   Platform,
+  Keyboard,
+  KeyboardEvent,
 } from "react-native";
 import { router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLORS } from "@/constants/colors";
 import { Message } from "@/constants/types";
+import { createChat } from "@/api/chat";
+import { getInferResult } from "@/storage/useInfer";
 
-const INITIAL_MESSAGES: Message[] = [
-  { role: "agent", text: "How did marching feel? Tremor better? 😊", time: "9:45 AM" },
-  { role: "user", text: "Tremor worse after lunch", time: "12:32 PM" },
-  {
-    role: "agent",
-    text: "Sorry to hear. Try rest 10min + med check. Track now?",
-    time: "12:32 PM",
-    hasAction: true,
-  },
-  { role: "user", text: "Why gait now?", time: "2:10 PM" },
-  {
-    role: "agent",
-    text: "Your tremor peaks at 10AM. Gait training reduces it 25% based on your data. 📊",
-    time: "2:10 PM",
-  },
-];
-
-const QUICK_REPLIES = ["Tremor?", "Next?", "Explain?", "Call caregiver", "Sleep bad", "Why gait?"];
-
-const AGENT_RESPONSES: Record<string, string> = {
-  "Tremor?": "Current tremor level: HIGH. Elevated for the past 2 hours. Try seated breathing now?",
-  "Next?": "Next activity is Stretching at 10AM. Should reduce tremor by ~20% based on your data.",
-  "Explain?": "I use your wearable data + activity history to find patterns. Gait training reduces YOUR tremor by 24% on average.",
-  "Call caregiver": "Calling Sarah (caregiver)... 📞",
-  "Sleep bad": "Prioritizing breathing exercises today since sleep affects tremor. Take melatonin tonight? 💊",
-  "Why gait?": "Your tremor peaks at 10AM. Gait training reduces it 25% based on your data. 📊",
-};
+const INITIAL_MESSAGES: Message[] = [];
 
 export default function ChatScreen() {
+
+  const [chatHistory, setChatHistory] = useState<{ role: string, content: string }[]>([]);
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
   const [voiceMode, setVoiceMode] = useState(true);
   const [recording, setRecording] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
+  const insets = useSafeAreaInsets();
 
-  const send = (text: string) => {
-    if (!text.trim()) return;
-    const agentText = AGENT_RESPONSES[text] ?? `Thanks for sharing. Updating your plan based on: "${text}" 🤔`;
-    setMessages((m) => [
-      ...m,
-      { role: "user", text, time: "Now" },
-      { role: "agent", text: agentText, time: "Now" },
-    ]);
-    setInput("");
+  // Track keyboard height directly
+
+  const clearChat = async () => {
+    await AsyncStorage.removeItem("chat_messages");
+    await AsyncStorage.removeItem("chat_history");
+    setMessages([]);
+    setChatHistory([]);
+  };
+
+  useEffect(() => {
+    const load = async () => {
+      const savedMessages = await AsyncStorage.getItem("chat_messages");
+      const savedHistory = await AsyncStorage.getItem("chat_history");
+      if (savedMessages) setMessages(JSON.parse(savedMessages));
+      if (savedHistory) setChatHistory(JSON.parse(savedHistory));
+      const pending = await AsyncStorage.getItem("pending_message");
+      if (pending) {
+        await AsyncStorage.removeItem("pending_message");
+        send(pending); // auto sends on open
+      }
+    };
+    load();
+  }, []);
+
+  useEffect(() => {
+    if (messages.length === 0) return;
+    AsyncStorage.setItem("chat_messages", JSON.stringify(messages));
+  }, [messages]);
+
+  useEffect(() => {
+    if (chatHistory.length === 0) return;
+    AsyncStorage.setItem("chat_history", JSON.stringify(chatHistory));
+  }, [chatHistory]);
+
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      (e: KeyboardEvent) => setKeyboardHeight(e.endCoordinates.height)
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => setKeyboardHeight(0)
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  // Scroll to bottom when keyboard opens or messages change
+  useEffect(() => {
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+  }, [keyboardHeight, messages]);
+
+  const send = async (text: string) => {
+    if (!text.trim() || loading) return;
+
+    const inferResult = await getInferResult();
+
+    setMessages((m) => [...m, { role: "user", text, time: "Now" }]);
+    setInput("");
+    setLoading(true);
+
+    try {
+      const historyText = chatHistory
+        .map(h => `${h.role}: ${h.content}`)
+        .join("\n");
+
+      const res = await createChat(text +
+        " Chat History: " + historyText +
+        " Inference Recommended: " + (inferResult?.pred_label ?? ""));
+
+      // update history with both user + agent messages
+      setChatHistory((h) => [
+        ...h,
+        { role: "user", content: text },
+        { role: "assistant", content: res.content },
+      ]);
+
+      setMessages((m) => [
+        ...m,
+        { role: "agent", text: res.content, time: "Now" },
+      ]);
+
+    } catch (e) {
+      setMessages((m) => [
+        ...m,
+        { role: "agent", text: "Sorry, couldn't reach the assistant. Try again.", time: "Now" },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>CureMotion Assistant</Text>
+          <Text style={styles.headerTitle}>HealinMotion Assistant</Text>
           <Text style={styles.headerStatus}>● Online • Context-aware</Text>
         </View>
-        <View style={{ width: 40 }} />
+        <TouchableOpacity onPress={clearChat} style={styles.clearBtn}>
+          <Text style={styles.clearBtnText}>Clear</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Messages */}
@@ -84,6 +151,7 @@ export default function ChatScreen() {
         style={styles.messages}
         contentContainerStyle={{ padding: 16, paddingBottom: 8 }}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
       >
         {messages.map((m, i) => (
@@ -114,67 +182,64 @@ export default function ChatScreen() {
             <Text style={styles.msgTime}>{m.time}</Text>
           </View>
         ))}
+
+        {/* Typing indicator */}
+        {loading && (
+          <View style={styles.msgWrapper}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarEmoji}>🧠</Text>
+            </View>
+            <View style={styles.bubbleAgent}>
+              <Text style={{ color: COLORS.textMuted, fontSize: 14, padding: 14 }}>Thinking...</Text>
+            </View>
+          </View>
+        )}
       </ScrollView>
 
-      {/* Quick Replies */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.quickReplies}
-        style={styles.quickRepliesScroll}
-      >
-        {QUICK_REPLIES.map((r) => (
-          <TouchableOpacity key={r} onPress={() => send(r)} style={styles.quickReply}>
-            <Text style={styles.quickReplyText}>{r}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      {/* Bottom section pushed up by keyboard height */}
+      <View style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight - insets.bottom : insets.bottom }}>
 
-      {/* Input Bar */}
-      <View style={styles.inputBar}>
-        <TouchableOpacity
-          onPress={() => setVoiceMode(!voiceMode)}
-          style={[styles.modeBtn, voiceMode && styles.modeBtnActive]}
+        {/* Quick Replies */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.quickReplies}
+          style={styles.quickRepliesScroll}
+          keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.modeBtnIcon}>{voiceMode ? "🎙" : "⌨"}</Text>
-        </TouchableOpacity>
+        </ScrollView>
 
-        {voiceMode ? (
-          <Pressable
-            onPressIn={() => setRecording(true)}
-            onPressOut={() => { setRecording(false); send("Voice message sent"); }}
-            style={[styles.voiceBtn, recording && styles.voiceBtnActive]}
-          >
-            <Text style={[styles.voiceBtnText, recording && { color: COLORS.primary }]}>
-              {recording ? "🔴 Listening... release to send" : "Hold to speak"}
-            </Text>
-          </Pressable>
-        ) : (
+        {/* Input Bar */}
+        <View style={styles.inputBar}>
           <TextInput
             value={input}
             onChangeText={setInput}
             onSubmitEditing={() => send(input)}
-            placeholder="Type a message..."
+            placeholder="Chat with assistant"
             placeholderTextColor={COLORS.textMuted}
             style={styles.textInput}
             returnKeyType="send"
           />
-        )}
+          <TouchableOpacity
+            onPress={() => send(input)}
+            style={[styles.sendBtn, loading && { opacity: 0.5 }]}
+            disabled={loading}
+          >
+            <Text style={styles.sendBtnText}>{loading ? "..." : "↑"}</Text>
+          </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity onPress={() => send(input)} style={styles.sendBtn}>
-          <Text style={styles.sendBtnText}>↑</Text>
-        </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg, },
+  container: { flex: 1, backgroundColor: COLORS.bg },
 
   header: {
     flexDirection: "row", alignItems: "center",
-    paddingHorizontal: 20, paddingTop: 36, paddingBottom: 10
+    paddingHorizontal: 20, paddingTop: 12, paddingBottom: 10,
   },
   backBtn: {
     width: 40, height: 40, borderRadius: 14,
@@ -201,6 +266,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.cardBorder,
     borderTopLeftRadius: 4,
   },
+  clearBtn: {
+    width: 44, height: 44, borderRadius: 14,
+    backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.cardBorder,
+    alignItems: "center", justifyContent: "center",
+  },
+  clearBtnText: { fontSize: 11, fontWeight: "700", color: COLORS.textMuted },
   bubbleUser: {
     backgroundColor: COLORS.primary,
     borderWidth: 0,
@@ -208,7 +279,7 @@ const styles = StyleSheet.create({
   },
   bubbleAgent: {
     backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.cardBorder,
-    borderTopLeftRadius: 4,
+    borderTopLeftRadius: 4, borderRadius: 18, maxWidth: "82%",
   },
   bubbleText: { fontSize: 14, color: COLORS.textPrimary, lineHeight: 20 },
   bubbleTextUser: { color: "#fff" },
@@ -238,7 +309,7 @@ const styles = StyleSheet.create({
 
   inputBar: {
     flexDirection: "row", gap: 10, alignItems: "center",
-    padding: 12, paddingHorizontal: 16, paddingBottom: 40,
+    padding: 12, paddingHorizontal: 16,
   },
   modeBtn: {
     width: 44, height: 44, borderRadius: 14,

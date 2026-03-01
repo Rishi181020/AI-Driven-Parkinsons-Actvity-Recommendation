@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import { router } from "expo-router";
 import Svg, { Circle } from "react-native-svg";
 import { COLORS } from "@/constants/colors";
 import { useTimer } from "@/hooks/useTimer";
+import { useLocalSearchParams } from "expo-router";
 
 type Phase = "detail" | "timer" | "feedback";
 
@@ -27,11 +28,18 @@ export default function ActivityScreen() {
   const { timer, running, start, pause, fmt } = useTimer(120);
   const pct = ((120 - timer) / 120) * 100;
   const circumference = 2 * Math.PI * 88;
-
+  const { rec } = useLocalSearchParams<{ rec?: string }>();
+  const recommendation = rec ? JSON.parse(rec) : null;
   const handleStart = () => {
     setPhase("timer");
     start();
   };
+  const params = useLocalSearchParams();
+  useEffect(() => {
+    console.log("OG:", rec)
+    console.log("ACTIVITY PARAMS:", params);
+    console.log(recommendation)
+  }, [params]);
 
   return (
     <View style={styles.container}>
@@ -49,8 +57,12 @@ export default function ActivityScreen() {
         <View style={styles.content}>
           <View style={styles.heroSection}>
             <Text style={styles.heroEmoji}>🚶</Text>
-            <Text style={styles.heroTitle}>Marching in Place</Text>
-            <Text style={styles.heroMeta}>2 minutes • Low intensity</Text>
+            <Text style={styles.heroTitle}>
+              {recommendation?.pred_label ?? "Activity"}
+            </Text>
+            <Text style={styles.heroMeta}>
+              {recommendation?.duration ?? "2 minutes"} • {recommendation?.intensity ?? "Low intensity"}
+            </Text>
           </View>
 
           <View style={styles.benefitsCard}>
@@ -99,8 +111,7 @@ export default function ActivityScreen() {
             </View>
           </View>
 
-          <Text style={styles.timerActivity}>🚶 March in Place</Text>
-          <Text style={styles.timerHint}>Lift knees to hip height, swing arms naturally</Text>
+          <Text style={styles.timerActivity}>{recommendation.pred_label}</Text>
 
           <TouchableOpacity
             onPress={() => {
@@ -185,7 +196,7 @@ const styles = StyleSheet.create({
     alignItems: "center", justifyContent: "center",
   },
   backIcon: { fontSize: 18, color: COLORS.textSecondary },
-  headerTitle: { flex: 1, textAlign: "center", fontSize: 17, fontWeight: "700", color: COLORS.textPrimary },
+  headerTitle: { flex: 1, textAlign: "center", fontSize: 17, fontWeight: "700", color: COLORS.textPrimary, paddingTop: 40 },
 
   content: { flex: 1, paddingHorizontal: 24, paddingBottom: 32, gap: 16 },
 
