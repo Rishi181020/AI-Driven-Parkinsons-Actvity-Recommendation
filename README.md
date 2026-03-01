@@ -1,4 +1,4 @@
-# CureMotion
+# HealinMotion
 AI-driven activity recommendation system for Parkinson's disease patients.
 
 ## What It Does
