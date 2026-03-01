@@ -2,11 +2,11 @@
 AI-driven activity recommendation system for Parkinson's disease patients.
 
 ## What It Does
-Reads wearable sensor data in real time, detects freezing-of-gait (FOG) severity, and recommends the right activity for that moment. A TinyLlama chatbot explains the recommendation and answers follow-up questions in plain language.
+Reads wearable sensor data in real time, detects freezing-of-gait (FOG) severity, and recommends the right activity for that moment. A MedGemma-4B chatbot explains the recommendation and answers follow-up questions in plain language.
 
 ## Tech Stack
-- **Model** — Bidirectional LSTM trained on the Daphnet FOG clinical dataset
-- **LLM** — TinyLlama via vLLM on AMD MI300X GPU
+- **Model** — Bidirectional LSTM trained on the Parkinson's FOG Prediction dataset
+- **LLM** — MedGemma-4B running on AMD MI300X GPU via ROCm Docker
 - **Backend** — FastAPI + SQLModel + SQLite
 - **Frontend** — React Native (Expo)
 
@@ -27,22 +27,22 @@ git clone https://github.com/your-repo/AI-Driven-Parkinsons-Actvity-Recommendati
 cd AI-Driven-Parkinsons-Actvity-Recommendation
 ```
 
-**3. Start vLLM**
+**3. Start MedGemma-4B on ROCm**
 ```bash
 docker run -it \
   --device=/dev/kfd \
   --device=/dev/dri \
   --network=host \
-  vllm/vllm-rocm \
+  rocm/pytorch:latest \
   python -m vllm.entrypoints.openai.api_server \
-    --model TinyLlama/TinyLlama-1.1B-Chat-v1.0 \
+    --model google/medgemma-4b \
     --host 0.0.0.0 \
     --port 8000
 ```
 
 **4. Build and run the backend**
 ```bash
-docker build -t parkinsons-backend ./inference
+docker build -t parkinsons-backend .
 docker run --network=host -e VLLM_URL=http://localhost:8000 parkinsons-backend
 ```
 
