@@ -6,7 +6,14 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from llama_cpp import Llama
 
+
 app = FastAPI(title="Parkinson Activity & Chat Assistant")
+
+import os
+# Prevent TensorFlow from pre-allocating all VRAM
+os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+# Ensure AMD GPU is recognized correctly
+os.environ['HSA_OVERRIDE_GFX_VERSION'] = '10.3.0'
 
 # --- 1. CONFIG & CLASSES ---
 ENCODER_CLASSES = np.array([0, 1, 2, 3, 4, 6], dtype=np.int32)
