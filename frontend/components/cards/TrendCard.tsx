@@ -22,7 +22,7 @@ export const TrendCard = () => (
               styles.bar,
               {
                 height: (v / MAX) * 72,
-                backgroundColor: i === 6 ? COLORS.green : COLORS.green + "55",
+                backgroundColor: i === 6 ? COLORS.success : COLORS.success + "55",
               },
             ]}
           />
@@ -47,9 +47,9 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 20,
   },
-  tag: { fontSize: 11, color: COLORS.green, fontWeight: "700", letterSpacing: 1, marginBottom: 6 },
+  tag: { fontSize: 11, color: COLORS.success, fontWeight: "700", letterSpacing: 1, marginBottom: 6 },
   subtitle: { fontSize: 14, color: COLORS.textSecondary, marginBottom: 16, lineHeight: 20 },
-  highlight: { color: COLORS.green, fontWeight: "700" },
+  highlight: { color: COLORS.success, fontWeight: "700" },
   chartContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
@@ -61,11 +61,11 @@ const styles = StyleSheet.create({
   bar: { width: "100%", borderRadius: 6 },
   dayLabel: { fontSize: 10, color: COLORS.textMuted },
   summaryBox: {
-    backgroundColor: COLORS.green + "11",
+    backgroundColor: COLORS.success + "11",
     borderWidth: 1,
-    borderColor: COLORS.green + "33",
+    borderColor: COLORS.success + "33",
     borderRadius: 12,
     padding: 12,
   },
-  summaryText: { fontSize: 13, color: COLORS.green, fontWeight: "600" },
+  summaryText: { fontSize: 13, color: COLORS.success, fontWeight: "600" },
 });

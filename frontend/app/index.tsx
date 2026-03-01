@@ -35,7 +35,7 @@ export default function HomeScreen() {
         <View>
           <Text style={styles.greeting}>Good morning,</Text>
           <Text style={styles.name}>
-            Michael <Text style={{ color: COLORS.orange }}>👋</Text>
+            Michael <Text style={{ color: COLORS.primary }}>👋</Text>
           </Text>
         </View>
         <TouchableOpacity
@@ -50,7 +50,7 @@ export default function HomeScreen() {
         {/* Live Metrics */}
         <View style={styles.metrics}>
           <TremorBar level="HIGH" />
-          <MetricChip icon="👟" label="Steps" value="2.1k" color={COLORS.blue} />
+          <MetricChip icon="👟" label="Steps" value="2.1k" color={COLORS.secondary} />
           <MetricChip icon="😴" label="Sleep" value="6h2m" color={COLORS.textSecondary} />
         </View>
 
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: COLORS.cardBorder,
     alignItems: "center", justifyContent: "center",
   },
-  tabActive: { backgroundColor: COLORS.orange, borderColor: COLORS.orange },
+  tabActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   tabText: { fontSize: 11, fontWeight: "700", letterSpacing: 0.5, color: COLORS.textMuted },
   tabTextActive: { color: "#fff" },
 
@@ -153,9 +153,9 @@ const styles = StyleSheet.create({
   chatBubbleWrapper: { position: "absolute", bottom: 80, right: 24 },
   chatBubble: {
     width: 60, height: 60, borderRadius: 99,
-    backgroundColor: COLORS.orange,
+    backgroundColor: COLORS.primary,
     alignItems: "center", justifyContent: "center",
-    shadowColor: COLORS.orange,
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.5,
     shadowRadius: 16,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   badge: {
     position: "absolute", top: -8, right: -4, zIndex: 1,
     width: 18, height: 18, borderRadius: 99,
-    backgroundColor: COLORS.red,
+    backgroundColor: COLORS.danger,
     alignItems: "center", justifyContent: "center",
   },
   badgeText: { fontSize: 11, fontWeight: "800", color: "#fff" },

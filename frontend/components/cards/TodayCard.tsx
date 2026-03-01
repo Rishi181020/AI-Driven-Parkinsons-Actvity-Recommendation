@@ -5,9 +5,9 @@ import { Activity } from "@/constants/types";
 import { router } from "expo-router";
 
 const activities: Activity[] = [
-  { time: "8:00 AM", name: "Gait Training", icon: "🚶", color: COLORS.blue },
-  { time: "10:00 AM", name: "Stretching", icon: "🧘", color: COLORS.green },
-  { time: "12:00 PM", name: "Breathing", icon: "💨", color: COLORS.yellow },
+  { time: "8:00 AM", name: "Gait Training", icon: "🚶", color: COLORS.secondary },
+  { time: "10:00 AM", name: "Stretching", icon: "🧘", color: COLORS.success },
+  { time: "12:00 PM", name: "Breathing", icon: "💨", color: COLORS.warning },
 ];
 
 export const TodayCard = () => (
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 20,
   },
-  tag: { fontSize: 11, color: COLORS.orange, fontWeight: "700", letterSpacing: 1, marginBottom: 6 },
+  tag: { fontSize: 11, color: COLORS.primary, fontWeight: "700", letterSpacing: 1, marginBottom: 6 },
   subtitle: { fontSize: 14, color: COLORS.textSecondary, marginBottom: 16, lineHeight: 20 },
   row: {
     flexDirection: "row",
@@ -73,11 +73,11 @@ const styles = StyleSheet.create({
     marginTop: 14,
     height: 38,
     borderRadius: 12,
-    backgroundColor: COLORS.orangeGlow,
+    backgroundColor: COLORS.primaryGlow,
     borderWidth: 1,
-    borderColor: COLORS.orange + "44",
+    borderColor: COLORS.primary + "44",
     alignItems: "center",
     justifyContent: "center",
   },
-  explainText: { fontSize: 12, fontWeight: "700", color: COLORS.orange },
+  explainText: { fontSize: 12, fontWeight: "700", color: COLORS.primary },
 });

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, DimensionValue } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, DimensionValue, StyleProp, ViewStyle } from "react-native";
 import { COLORS } from "@/constants/colors";
 import { TremorLevel } from "@/constants/types";
 
@@ -14,6 +14,7 @@ import { TremorLevel } from "@/constants/types";
 // ── Primary Button ────────────────────────────────────────────────────────────
 interface BtnProps {
   label: string;
+  style?: StyleProp<ViewStyle>;
   onPress: () => void;
   secondary?: boolean;
   disabled?: boolean;
@@ -60,9 +61,9 @@ export const MetricChip = ({ label, value, color, icon }: MetricChipProps) => (
 
 // ── TremorBar ─────────────────────────────────────────────────────────────────
 const tremorColors: Record<TremorLevel, string> = {
-  LOW: COLORS.green,
-  MEDIUM: COLORS.yellow,
-  HIGH: COLORS.red,
+  LOW: COLORS.success,
+  MEDIUM: COLORS.warning,
+  HIGH: COLORS.danger,
 };
 const tremorWidths: Record<TremorLevel, DimensionValue> = {
   LOW: "30%",
@@ -125,8 +126,9 @@ const styles = StyleSheet.create({
   statusText: { color: COLORS.textSecondary, fontSize: 12 },
 
   btn: {
-    height: 56, borderRadius: 18, backgroundColor: COLORS.orange,
+    height: 56, borderRadius: 18, backgroundColor: COLORS.primary,
     alignItems: "center", justifyContent: "center",
+    padding: 10
   },
   btnSecondary: { backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.cardBorder },
   btnDisabled: { backgroundColor: "#222" },
@@ -155,18 +157,18 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.cardBorder,
     borderRadius: 18, padding: 16, flexDirection: "row", alignItems: "center", gap: 14,
   },
-  permCardGranted: { borderColor: COLORS.green + "44" },
+  permCardGranted: { borderColor: COLORS.success + "44" },
   permIcon: { fontSize: 28 },
   permInfo: { flex: 1 },
   permTitle: { fontSize: 15, fontWeight: "700", color: COLORS.textPrimary },
   permSub: { fontSize: 12, color: COLORS.textSecondary },
   permBtn: {
     paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12,
-    backgroundColor: COLORS.orangeGlow, borderWidth: 1, borderColor: COLORS.orange,
+    backgroundColor: COLORS.primaryGlow, borderWidth: 1, borderColor: COLORS.primary,
   },
-  permBtnGranted: { backgroundColor: COLORS.green + "22", borderColor: COLORS.green },
-  permBtnText: { fontSize: 12, fontWeight: "700", color: COLORS.orange },
-  permBtnTextGranted: { color: COLORS.green },
+  permBtnGranted: { backgroundColor: COLORS.success + "22", borderColor: COLORS.success },
+  permBtnText: { fontSize: 12, fontWeight: "700", color: COLORS.primary },
+  permBtnTextGranted: { color: COLORS.success },
 
   quickAction: {
     flex: 1, height: 60, borderRadius: 16, backgroundColor: COLORS.card,

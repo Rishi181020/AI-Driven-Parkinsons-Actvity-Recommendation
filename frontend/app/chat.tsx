@@ -72,7 +72,7 @@ export default function ChatScreen() {
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>Neuro Assistant</Text>
+          <Text style={styles.headerTitle}>CureMotion Assistant</Text>
           <Text style={styles.headerStatus}>● Online • Context-aware</Text>
         </View>
         <View style={{ width: 40 }} />
@@ -145,7 +145,7 @@ export default function ChatScreen() {
             onPressOut={() => { setRecording(false); send("Voice message sent"); }}
             style={[styles.voiceBtn, recording && styles.voiceBtnActive]}
           >
-            <Text style={[styles.voiceBtnText, recording && { color: COLORS.orange }]}>
+            <Text style={[styles.voiceBtnText, recording && { color: COLORS.primary }]}>
               {recording ? "🔴 Listening... release to send" : "Hold to speak"}
             </Text>
           </Pressable>
@@ -170,11 +170,11 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg },
+  container: { flex: 1, backgroundColor: COLORS.bg, },
 
   header: {
     flexDirection: "row", alignItems: "center",
-    paddingHorizontal: 20, paddingTop: 36,
+    paddingHorizontal: 20, paddingTop: 36, paddingBottom: 10
   },
   backBtn: {
     width: 40, height: 40, borderRadius: 14,
@@ -184,14 +184,14 @@ const styles = StyleSheet.create({
   backIcon: { fontSize: 18, color: COLORS.textSecondary },
   headerCenter: { flex: 1, alignItems: "center" },
   headerTitle: { fontSize: 16, fontWeight: "800", color: COLORS.textPrimary },
-  headerStatus: { fontSize: 11, color: COLORS.green },
+  headerStatus: { fontSize: 11, color: COLORS.success },
 
   messages: { flex: 1 },
   msgWrapper: { marginBottom: 14 },
   msgWrapperUser: { alignItems: "flex-end" },
   avatar: {
     width: 28, height: 28, borderRadius: 99,
-    backgroundColor: COLORS.orange,
+    backgroundColor: COLORS.primary,
     alignItems: "center", justifyContent: "center",
     marginBottom: 4,
   },
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 4,
   },
   bubbleUser: {
-    backgroundColor: COLORS.orange,
+    backgroundColor: COLORS.primary,
     borderWidth: 0,
     borderRadius: 18, borderTopRightRadius: 4,
   },
@@ -217,10 +217,10 @@ const styles = StyleSheet.create({
   actionRow: { flexDirection: "row", gap: 8, marginTop: 10 },
   yesBtn: {
     flex: 1, height: 34, borderRadius: 10,
-    backgroundColor: COLORS.green + "22", borderWidth: 1, borderColor: COLORS.green + "55",
+    backgroundColor: COLORS.success + "22", borderWidth: 1, borderColor: COLORS.success + "55",
     alignItems: "center", justifyContent: "center",
   },
-  yesBtnText: { fontSize: 12, fontWeight: "700", color: COLORS.green },
+  yesBtnText: { fontSize: 12, fontWeight: "700", color: COLORS.success },
   noBtn: {
     flex: 1, height: 34, borderRadius: 10,
     borderWidth: 1, borderColor: COLORS.cardBorder,
@@ -245,14 +245,14 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.cardBorder,
     alignItems: "center", justifyContent: "center",
   },
-  modeBtnActive: { backgroundColor: COLORS.orangeGlow, borderColor: COLORS.orange },
+  modeBtnActive: { backgroundColor: COLORS.primaryGlow, borderColor: COLORS.primary },
   modeBtnIcon: { fontSize: 18 },
   voiceBtn: {
     flex: 1, height: 44, borderRadius: 14,
     backgroundColor: COLORS.card, borderWidth: 1, borderColor: COLORS.cardBorder,
     alignItems: "center", justifyContent: "center",
   },
-  voiceBtnActive: { backgroundColor: COLORS.orangeGlow, borderColor: COLORS.orange },
+  voiceBtnActive: { backgroundColor: COLORS.primaryGlow, borderColor: COLORS.primary },
   voiceBtnText: { fontSize: 13, fontWeight: "700", color: COLORS.textMuted },
   textInput: {
     flex: 1, height: 44, borderRadius: 14,
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   },
   sendBtn: {
     width: 44, height: 44, borderRadius: 14,
-    backgroundColor: COLORS.orange,
+    backgroundColor: COLORS.primary,
     alignItems: "center", justifyContent: "center",
   },
   sendBtnText: { fontSize: 18, color: "#fff", fontWeight: "700" },
