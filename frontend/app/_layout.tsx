@@ -14,7 +14,7 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="onboarding" />
-        <Stack.Screen name="index" />
+        <Stack.Screen name="index" options={{ animation: "slide_from_right" }} />
         <Stack.Screen name="activity" options={{ animation: "slide_from_bottom" }} />
         <Stack.Screen name="chat" options={{ animation: "slide_from_bottom" }} />
         <Stack.Screen name="settings" />
