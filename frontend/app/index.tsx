@@ -13,12 +13,16 @@ import { MetricChip, TremorBar, PermCard, QuickAction } from "@/components/ui/UI
 import { TodayCard } from "@/components/cards/TodayCard";
 import { CurrentRecCard } from "@/components/cards/CurrentRecCard";
 import { TrendCard } from "@/components/cards/TrendCard";
+import { getUsername } from "@/storage/user";
+import { useUsername } from "@/hooks/useUser";
 
 const CARD_LABELS = ["TODAY", "NOW", "TREND"];
+
 
 export default function HomeScreen() {
   const [cardIdx, setCardIdx] = useState(0);
 
+  const username = useUsername();
   const panResponder = PanResponder.create({
     onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 10,
     onPanResponderRelease: (_, g) => {
@@ -35,7 +39,7 @@ export default function HomeScreen() {
         <View>
           <Text style={styles.greeting}>Good morning,</Text>
           <Text style={styles.name}>
-            Michael <Text style={{ color: COLORS.primary }}>👋</Text>
+            {username}<Text style={{ color: COLORS.primary }}>👋</Text>
           </Text>
         </View>
         <TouchableOpacity
