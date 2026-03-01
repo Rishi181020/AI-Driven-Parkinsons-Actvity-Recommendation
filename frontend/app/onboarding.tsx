@@ -165,7 +165,7 @@ export default function OnboardingScreen() {
 
             <View style={styles.inputRow}>
               <View style={styles.smallInput}>
-                <Text style={styles.inputLabel}>💊 Last med</Text>
+                <Text style={styles.inputLabel}> Last med</Text>
                 <TextInput
                   placeholder="9:00 AM"
                   placeholderTextColor={COLORS.textMuted}
@@ -175,7 +175,7 @@ export default function OnboardingScreen() {
                 />
               </View>
               <View style={styles.smallInput}>
-                <Text style={styles.inputLabel}>😴 Sleep</Text>
+                <Text style={styles.inputLabel}>Sleep</Text>
                 <TextInput
                   placeholder="7h 30m"
                   placeholderTextColor={COLORS.textMuted}
@@ -205,7 +205,7 @@ export default function OnboardingScreen() {
             </View>
 
             <View style={styles.recCard}>
-              <Text style={styles.recTag}>🎯 Start now</Text>
+              <Text style={styles.recTag}>Start now</Text>
               <Text style={styles.recName}>Seated Arm Circles</Text>
               <Text style={styles.recMeta}>2 minutes • Great for morning tremor</Text>
               <TouchableOpacity onPress={goNext} style={styles.recBtn} activeOpacity={0.85}>

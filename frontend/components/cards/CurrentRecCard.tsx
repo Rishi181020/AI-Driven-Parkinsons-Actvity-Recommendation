@@ -31,13 +31,13 @@ export const CurrentRecCard = () => {
 
       <View style={styles.row}>
         <TouchableOpacity style={styles.secondaryBtn}>
-          <Text style={styles.secondaryBtnText}>⏰ Snooze 15m</Text>
+          <Text style={styles.secondaryBtnText}>Snooze 15m</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.secondaryBtn}
           onPress={() => router.push("/activity")}
         >
-          <Text style={styles.secondaryBtnText}>❓ Why this?</Text>
+          <Text style={styles.secondaryBtnText}>Why this?</Text>
         </TouchableOpacity>
       </View>
     </View>
